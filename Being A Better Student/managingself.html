@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Managing The Self</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    header.main-header {
+      background: linear-gradient(90deg, #e6e6e6, #f7f7f7);
+      padding: 8px 0 6px;
+      text-align: center;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.12);
+      position: sticky;
+      top: 0;
+      z-index: 1100;
+    }
+
+    #main-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #222;
+      text-shadow: 0 0 5px rgba(0,0,0,0.3), 0 2px 3px rgba(255,255,255,0.6);
+      display: inline-flex;
+      gap: 3px;
+      cursor: default;
+    }
+
+    #main-title span {
+      transition: transform 0.25s ease, text-shadow 0.25s ease, color 0.25s ease;
+    }
+
+    #main-title span:hover {
+      transform: translateY(-8px);
+      color: #666;
+      text-shadow: 0 0 10px rgba(0,0,0,0.6), 0 4px 6px rgba(255,255,255,0.9);
+    }
+
+    nav#nav-bar {
+      background: linear-gradient(90deg, #f7f7f7, #e6e6e6);
+      display: flex;
+      justify-content: center;
+      padding: 12px 0 30px;
+      position: sticky;
+      top: 42px;
+      z-index: 1050;
+    }
+
+    #xmb {
+      display: flex;
+      gap: 60px;
+      white-space: nowrap;
+      text-align: center;
+      position: relative;
+    }
+
+    .xmb-item {
+      position: relative;
+      cursor: pointer;
+      transition: filter 0.3s ease, transform 0.3s ease, color 0.3s ease, text-shadow 0.3s ease;
+      padding: 10px 0;
+      color: #555;
+      font-weight: 600;
+      font-size: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    .xmb-item:hover,
+    .xmb-item:focus-visible,
+    .xmb-item.active {
+      color: #999;
+      text-shadow: 0 0 8px rgba(153,153,153,0.8), 0 3px 6px rgba(255,255,255,0.6);
+      transform: translateY(-8px);
+      outline: none;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(6px);
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      user-select: none;
+      pointer-events: none;
+      opacity: 0;
+      transition: all 0.3s ease-in-out;
+      border-radius: 10px;
+      white-space: nowrap;
+      min-width: 140px;
+      z-index: 1200;
+    }
+
+    .xmb-item:hover > .dropdown,
+    .xmb-item:focus-within > .dropdown,
+    .xmb-item.active > .dropdown {
+      display: flex;
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+      pointer-events: auto;
+    }
+
+    .dropdown a {
+      color: #999;
+      font-weight: 500;
+      font-size: 13px;
+      text-decoration: none;
+      text-shadow: 0 0 6px rgba(153,153,153,0.7);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .dropdown a:hover,
+    .dropdown a:focus {
+      color: #ccc;
+      background: rgba(255,255,255,0.15);
+      transform: scale(1.08);
+      box-shadow: 0 2px 8px rgba(204,204,204,0.4);
+      outline: none;
+    }
+
+    main.intro {
+      flex: 1 0 auto;
+      max-width: 700px;
+      margin: 24px auto 40px;
+      padding: 0 20px;
+      font-size: 18px;
+      color: #444;
+      line-height: 1.6;
+      user-select: text;
+    }
+
+    footer {
+      position: sticky;
+      bottom: 0;
+      height: 80px;
+      width: 100%;
+      background: linear-gradient(90deg, #f7f7f7, #e6e6e6);
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 500;
+      font-size: 14px;
+      color: #555;
+      user-select: none;
+    }
+
+    .wave-svg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 100%;
+      animation: wave-move 8s linear infinite;
+      fill: #ccc;
+      opacity: 0.4;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    @keyframes wave-move {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* PSP Boot Animation */
+    #gameboot-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #fff;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      overflow: hidden;
+    }
+
+    #psp-logo {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-weight: 600;
+      font-size: 3rem;
+      color: #222;
+      letter-spacing: 0.15em;
+      user-select: none;
+      z-index: 3010;
+    }
+
+    .circle {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.95;
+      animation: pop 1.2s ease-out forwards;
+      animation-fill-mode: forwards;
+      pointer-events: none;
+    }
+
+    .circle.orange {
+      background: radial-gradient(circle at top left, #ff9a00, #ff6a00);
+      width: 1800px;
+      height: 1800px;
+      top: -500px;
+      left: -500px;
+      animation-delay: 0s;
+    }
+
+    .circle.lime {
+      background: radial-gradient(circle at top left, #a3ff00, #6aff00);
+      width: 1800px;
+      height: 1800px;
+      top: -500px;
+      left: -500px;
+      animation-delay: 0.05s;
+    }
+
+    .circle.green {
+      background: radial-gradient(circle at bottom right, #32cd32, #228b22);
+      width: 1800px;
+      height: 1800px;
+      bottom: -500px;
+      right: -500px;
+      animation-delay: 0.1s;
+    }
+
+    .circle.blue {
+      background: radial-gradient(circle at top left, #1e90ff, #104e8b);
+      width: 1200px;
+      height: 1200px;
+      top: 150px;
+      left: 150px;
+      animation-delay: 0.2s;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0);
+        opacity: 0;
+      }
+      60% {
+        transform: scale(2);
+        opacity: 0.95;
+      }
+      100% {
+        transform: scale(3);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="main-header">
+    <h1 id="main-title"></h1>
+  </header>
+
+  <nav id="nav-bar" role="navigation" aria-label="Primary Navigation">
+    <div id="xmb">
+      <div class="xmb-item" tabindex="0" aria-haspopup="true">
+        🧘 Self-Care
+        <div class="dropdown" role="menu">
+          <a data-title="Managing the Self" data-target="managingself.html">Managing the Self</a>
+          <a data-title="Caring for the Self" data-target="careself.html">Caring for the Self</a>
+        </div>
+      </div>
+      <div class="xmb-item" tabindex="0" aria-haspopup="true">
+        🌱 Personal Growth
+        <div class="dropdown" role="menu">
+          <a data-title="Importance of Self-Growth" data-target="selfgrowth.html">Importance of Self-Growth</a>
+        </div>
+      </div>
+      <div class="xmb-item" tabindex="0" aria-haspopup="true">
+        ℹ️ About
+        <div class="dropdown" role="menu">
+          <a data-title="About Us" data-target="about.html">About Us</a>
+        </div>
+      </div>
+      <div class="xmb-item" tabindex="0" aria-haspopup="true">
+        📚 References
+        <div class="dropdown" role="menu">
+          <a data-title="References" data-target="references.html">References</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="intro" style="max-width: 900px; margin: 60px auto; padding: 0 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; line-height: 1.8; font-size: 18px;">
+    <h2 style="font-size: 26px; font-weight: bold; color: #2c3e50; margin-bottom: 20px;">Managing the Self</h2>
+    <p>
+      Managing the self is more than just checking things off a to-do list — it’s about becoming aware of your habits, your strengths, and your limits. It’s about learning how to take control of your time, responsibilities, and emotions in a way that helps you thrive, not just survive. Whether it's setting realistic goals, staying disciplined with your schedule, or finding the right balance between school and life, self-management is the quiet engine behind every successful student. It’s not easy, and it doesn’t always go as planned, but every attempt at organizing your life is a step forward.
+    </p>
+    <p>
+      There are times when everything feels like it’s happening at once — deadlines, group projects, personal problems — and that’s when managing yourself becomes even more important. It’s okay to feel overwhelmed. What matters is how you respond. Sometimes that means stepping back and reassessing your priorities. Other times, it’s breaking big tasks into smaller ones so they don’t feel so impossible. Self-management isn’t about being perfect; it’s about being present and proactive. It’s learning to listen to yourself, adjust where needed, and keep going even when the path gets messy.
+    </p>
+    <p>
+      Over time, the little things you do — setting reminders, planning your week, choosing sleep over an all-nighter — all begin to build the foundation for something bigger. You become more confident in your ability to handle challenges, to bounce back from failure, and to stay committed to your growth. Managing the self is an ongoing process, unique to each person. And the more you practice it, the more it becomes second nature. It's not just about getting things done — it’s about becoming someone who knows how to navigate life with purpose, awareness, and resilience.
+    </p>
+  </main>
+
+
+  <footer>
+    © 2025 Group 3 - BSIT 2F
+    <svg class="wave-svg" viewBox="0 0 1200 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+      <path d="M0,30 C150,90 350,0 600,30 C850,60 1050,10 1200,30 L1200,100 L0,100 Z"></path>
+    </svg>
+  </footer>
+
+  <div id="gameboot-overlay" aria-hidden="true" role="presentation">
+    <div class="circle orange"></div>
+    <div class="circle lime"></div>
+    <div class="circle green"></div>
+    <div class="circle blue"></div>
+    <div id="psp-logo">PSP</div>
+  </div>
+
+  <script>
+    const mainTitleText = "Being A Better Student";
+    const mainTitle = document.getElementById('main-title');
+    mainTitleText.split('').forEach(char => {
+      const span = document.createElement('span');
+      span.textContent = char;
+      mainTitle.appendChild(span);
+    });
+
+    const gamebootOverlay = document.getElementById('gameboot-overlay');
+    const pspLogo = document.getElementById('psp-logo');
+    const dropdownLinks = document.querySelectorAll('.dropdown a');
+
+    dropdownLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const title = link.getAttribute('data-title');
+        const target = link.getAttribute('data-target');
+
+        if (title && target) {
+          pspLogo.textContent = title;
+          gamebootOverlay.style.display = 'flex';
+          gamebootOverlay.setAttribute('aria-hidden', 'false');
+
+          setTimeout(() => {
+            window.location.href = target;
+          }, 1500);
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
